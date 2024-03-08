@@ -1,63 +1,89 @@
 import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchLocations, filterLocations } from '../features/locations/locationsSlice'
+import LocationCard from '../components/LocationCard'
 import '../App.css'
-import axios from 'axios'
 
 export default function LocationsPage() {
-  const [count, setCount] = useState(0)
+  const locations = useSelector((state) => state.location)
+  const dispatch = useDispatch();
+  const [filterInfo, setFilterInfo] = useState('')
 
   useEffect(() => {
-    axios.get('https://rickandmortyapi.com/api/character')
-      .then(res => console.log(res))
-  }, [])
+    if (locations.status === 'idle') {
+      dispatch(fetchLocations('https://rickandmortyapi.com/api/location'))
+    }
+  }, [locations, dispatch])
 
+  let content;
+  if (locations.status === 'loading') {
+    content = <p>"Loading..."</p>;
+  } else if (locations.status === 'succeeded') {
+    content = locations.locations.map((character) => <LocationCard info={character} key={character.id} />)
+  } else if (locations.status === 'failed') {
+    content = <p>error</p>;
+  }
+
+  function getMoreLocations(e) {
+    e.preventDefault();
+    dispatch(fetchLocations(locations.nextLink))
+  }
+
+  function getFilteredLocations(e) {
+    e.preventDefault();
+    setFilterInfo(e.target.value)
+    let link = 'https://rickandmortyapi.com/api/location/?name=' + filterInfo
+    dispatch(filterLocations( link ))
+  }
 
   return (
     <>
-      <section class="filters">
-        <img src="/img/locations/main_image.svg" alt="" class="filters__img" />
-        <div class="filters__conteiner filters__container-locations">
-          <input type="text" class="filters__filters filters__filter-input filters__locations" placeholder="Filter by name..." id="filterName" value="" onchange="filter()" />
-          <select name="" id="" class="filters__filters filters__filter-select">
+      <section className="filters">
+        <img src="/img/locations/main_image.svg" alt="" className="filters__img" />
+        <div className="filters__conteiner filters__container-locations">
+          <input type="text" value={filterInfo} onChange={(e) => getFilteredLocations(e)} className="filters__filters filters__filter-input filters__locations" placeholder="Filter by name..." />
+
+          <select name="" id="" className="filters__filters filters__filter-select">
             <option value="" hidden>Type</option>
             <option value="">Smth 1</option>
             <option value="">Smth 2</option>
             <option value="">Smth 3</option>
           </select>
-          <select name="" id="" class="filters__filters filters__filter-select">
+          <select name="" id="" className="filters__filters filters__filter-select">
             <option value="" hidden>Demention</option>
             <option value="">Smth 1</option>
             <option value="">Smth 2</option>
             <option value="">Smth 3</option>
           </select>
-          <button id="filters__advanced" class="filters__advanced">Advanced filters</button>
-          <div id="myModal" class="filters__modal">
-            <div class="filters__modal-content">
-              <span class="filters__modal-text-row">
-                <p class="filters__modal-text">Filters</p>
-                <span class="close">&times;</span>
+          <button id="filters__advanced" className="filters__advanced">Advanced filters</button>
+          <div id="myModal" className="filters__modal">
+            <div className="filters__modal-content">
+              <span className="filters__modal-text-row">
+                <p className="filters__modal-text">Filters</p>
+                <span className="close">&times;</span>
               </span>
-              <select name="" id="" class="filters__filters filters__filter-select filters__modal-filter">
+              <select name="" id="" className="filters__filters filters__filter-select filters__modal-filter">
                 <option value="" hidden>Type</option>
                 <option value="">Smth 1</option>
                 <option value="">Smth 2</option>
                 <option value="">Smth 3</option>
               </select>
-              <select name="" id="" class="filters__filters filters__filter-select filters__modal-filter">
+              <select name="" id="" className="filters__filters filters__filter-select filters__modal-filter">
                 <option value="" hidden>Demention</option>
                 <option value="">Smth 1</option>
                 <option value="">Smth 2</option>
                 <option value="">Smth 3</option>
               </select>
-              <button class="filters__apply-btn">Apply</button>
+              <button className="filters__apply-btn">Apply</button>
             </div>
           </div>
         </div>
       </section>
-      <section class="locations">
-        <div class="characters__container" id="res">
-
+      <section className="locations">
+        <div className="characters__container" id="res">
+          {content}
         </div>
-        <div class="characters__button">Load more</div>
+        <button onClick={getMoreLocations} className="characters__button">Load more</button>
       </section>
     </>
   )
