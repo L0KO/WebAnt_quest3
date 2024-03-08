@@ -8,6 +8,7 @@ export default function CharactersPage() {
   const characters = useSelector((state) => state.character)
   const dispatch = useDispatch();
   const [filterInfo, setFilterInfo] = useState('')
+  const [modalDisplay, setModalDisplay] = useState({display: "none"})
 
   useEffect(() => {
     if (characters.status === 'idle') {
@@ -36,7 +37,6 @@ export default function CharactersPage() {
     dispatch(filterCharacters(link))
   }
 
-
   return (
     <>
       <section className="filters">
@@ -61,12 +61,12 @@ export default function CharactersPage() {
             <option value="">Smth 2</option>
             <option value="">Smth 3</option>
           </select>
-          <button id="filters__advanced" className="filters__advanced">Advanced filters</button>
-          <div id="myModal" className="filters__modal">
-            <div className="filters__modal-content">
+          <button id="filters__advanced" onClick={() => setModalDisplay({display: 'block'})} className="filters__advanced">Advanced filters</button>
+          <div id="myModal" onClick={() => setModalDisplay({display: 'none'})} className="filters__modal" style={modalDisplay}>
+            <div className="filters__modal-content" onClick={e => e.stopPropagation()}>
               <span className="filters__modal-text-row">
                 <p className="filters__modal-text">Filters</p>
-                <span className="close">&times;</span>
+                <span className="close" onClick={() => setModalDisplay({display: 'none'})}>&times;</span>
               </span>
               <select name="" id="" className="filters__filters filters__filter-select filters__modal-filter">
                 <option value="" hidden>Species</option>

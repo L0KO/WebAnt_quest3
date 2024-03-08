@@ -174,10 +174,6 @@ main {
   padding: 0 210px;
 }
 
-.Details{
-  
-}
-
 @media screen and (max-width: 1160px) {
   .main__back-button {
     left: 24px;
